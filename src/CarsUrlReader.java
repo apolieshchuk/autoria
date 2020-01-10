@@ -5,7 +5,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -13,12 +12,13 @@ import java.util.regex.Pattern;
 
 public class CarsUrlReader {
 
-    private static URL url;
-    private static Document document;
+    private URL url;
+    private Document document;
+    private final boolean CARS_LOG = false;
 
     public CarsUrlReader(String urlString) throws IOException {
         url = new URL(urlString);
-        document = getUrlDom();
+        document = getUrlDom(url);
     }
 
     /**
@@ -38,10 +38,11 @@ public class CarsUrlReader {
 
     /**
      * Get DOM from url
+     * @param url url -address
      * @return Document DOM
      * @throws IOException error
      */
-    public Document getUrlDom() throws IOException {
+    public Document getUrlDom(URL url) throws IOException {
 
         /* Read html form url stream (commons-io-1.3.2.jar library) */
         String htmlString = IOUtils.toString(url.openStream());
@@ -70,14 +71,14 @@ public class CarsUrlReader {
             Elements card_title = ticket.select(".ticket-title a");
             String title = card_title.attr("title");
 //            String title = cutInfoFromDiv("title=\"([^\"]+)", card_title);
-            System.out.println(title);
+            if (CARS_LOG) System.out.println(title);
             car.setTitle(title);
 
             /* Price */
             Elements card_price = ticket.select(".price-ticket");
             String price = card_price.attr("data-main-price");
 //            String price = cutInfoFromDiv("data-main-price=\"([^\"]+)", card_price);
-            System.out.println(price + "$");
+            if (CARS_LOG) System.out.println(price + "$");
             try {
                 car.setPrice(Integer.parseInt(price));
             } catch (Exception e) {
@@ -87,7 +88,7 @@ public class CarsUrlReader {
             /* Mileage */
             String card_mileage = ticket.select(".characteristic li:first-child").text();
             String mileage = cutInfoFromDiv("(\\d+)", card_mileage);
-            System.out.println(mileage + " тыс. км");
+            if (CARS_LOG) System.out.println(mileage + " тыс. км");
             try {
                 car.setMileage(Integer.parseInt(mileage));
             } catch (Exception e) {
@@ -97,13 +98,13 @@ public class CarsUrlReader {
             /* Fuel */
             String card_fuel = ticket.select(".characteristic li:nth-child(3)").text();
             String fuel = card_fuel.contains(",") ? card_fuel.substring(0, card_fuel.indexOf(",")) : "";
-            System.out.println(fuel);
+            if (CARS_LOG) System.out.println(fuel);
             car.setFuel(fuel);
 
             /* Year */
             Elements card_year = ticket.select("div:first-child");
             String year = card_year.attr("data-year");
-            System.out.println(year);
+            if (CARS_LOG) System.out.println(year);
             try {
                 car.setYear(Integer.parseInt(year));
             } catch (Exception e) {
@@ -111,7 +112,7 @@ public class CarsUrlReader {
             }
 
             cars.add(car);
-            System.out.println("---------------------------------------------");
+            if (CARS_LOG) System.out.println("---------------------------------------------");
         }
 
         return cars;
@@ -129,4 +130,14 @@ public class CarsUrlReader {
         if (!m.find()) return "";
         return m.group(1);
     }
+
+    public void setUrl(String urlString) throws IOException {
+        this.url = new URL(urlString);
+        this.document = getUrlDom(url);
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
 }

@@ -1,4 +1,6 @@
-public class CarCard {
+import java.io.Serializable;
+
+public class CarCard implements Serializable {
 
     private String title;
     private int mileage;
