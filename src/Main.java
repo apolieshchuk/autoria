@@ -32,7 +32,7 @@ public class Main {
         CarAnalyze analyzer = new CarAnalyze(carsDb);
 
         /* Year - average price */
-        if (arg.equals("year")){
+        if (arg.toLowerCase().equals("year")){
             HashMap<Integer, Integer> yearAveragePrice = analyzer.averagePrice(CarAnalyze.Arg.YEAR);
             System.out.println("Average price for "+ auto.toUpperCase() + " by year");
             for (Integer year: yearAveragePrice.keySet()) {
@@ -43,7 +43,7 @@ public class Main {
 
 
         /* Mileage - price */
-        if (arg.equals("mileage")){
+        if (arg.toLowerCase().equals("mileage")){
             HashMap<Integer, Integer> mileagePriceDb = analyzer.averagePrice(CarAnalyze.Arg.MILEAGE);
             SortedSet<Integer> keys = new TreeSet<>(mileagePriceDb.keySet()); // sort list
             System.out.println("Price for "+ auto.toUpperCase() + " by mileage ");
