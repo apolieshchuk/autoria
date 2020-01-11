@@ -2,22 +2,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CarAnalyze {
+    private final int MILEAGE_GRADATION = 20;
 
     private ArrayList<CarCard> carsDb;
+    private boolean accordingGbo;
     private int averageAutoPrice;
+    private int averageAutoMileage;
     private HashMap <Integer, ArrayList<Integer>> yearPriceDb;
     private HashMap <Integer, ArrayList<Integer>> mileagePriceDb;
 
-    enum Arg { YEAR, MILEAGE }
+    enum Arg { YEAR, MILEAGE, PRICE }
 
-    public CarAnalyze(ArrayList<CarCard> carsDb) {
+    public CarAnalyze(ArrayList<CarCard> carsDb, boolean gbo) {
+        /* according to gbo */
+        accordingGbo = gbo;
+
         /* Main db for analyze */
         this.carsDb = carsDb;
 
         /* Average auto price */
-        int sum = 0;
-        for (CarCard car : carsDb) sum += car.getPrice();
-        averageAutoPrice = sum / carsDb.size();
+        averageAutoPrice = avrageByAllAuto(Arg.PRICE);
+
+        /* Average auto mileage */
+        averageAutoMileage = avrageByAllAuto(Arg.MILEAGE);
 
         /* year-price db */
         this.yearPriceDb = priceDb(Arg.YEAR);
@@ -27,24 +34,66 @@ public class CarAnalyze {
 
     }
 
+    /* Average indicator for all cars */
+    private int avrageByAllAuto(Arg arg){
+        int sum = 0;
+        for (CarCard car : carsDb){
+            int indicator = 0;
+            switch (arg){
+                case YEAR:
+                    break;
+                case MILEAGE:
+                    indicator = car.getMileage();
+                    break;
+                case PRICE:
+                    indicator = car.getPrice();
+                    break;
+            }
+            sum += indicator;
+        }
+        return sum / carsDb.size();
+    }
+
+    /**
+     *  Nearest gradation for mileage
+     *
+     * @return   Return nearest gradation for mileage
+     */
+    public int nearestGradation(int mileage){
+        return (mileage / MILEAGE_GRADATION + 1) * MILEAGE_GRADATION;
+    }
+
     /**
      * Price db
      *
-     * @return HashMap <Integer, ArrayList<Integer>> yearPriceDb
+     * @return HashMap <Integer, ArrayList<Integer>> PriceDb
      * @param arg arg for looking price
      */
     private  HashMap <Integer, ArrayList<Integer>> priceDb(Arg arg){
         HashMap <Integer, ArrayList<Integer>> result = new HashMap<>();
         for (CarCard car: carsDb) {
-            /* Bad price filter */
-            if (car.getPrice() > averageAutoPrice * 2) continue;
+            /* Bad price and mileage filter */
+            if (car.getPrice() > averageAutoPrice * 2 || car.getPrice() < averageAutoPrice / 2) continue;
+            if (car.getMileage() > averageAutoMileage * 2) continue;
+
+            /* Get indicator */
+            int indicator = 0;
+            switch (arg){
+                case YEAR:
+                    indicator = car.getYear();
+                    break;
+                case MILEAGE:
+                    indicator = nearestGradation(car.getMileage());
+                    break;
+            }
 
             /* Fill in hashmap */
-            int indicator = arg == Arg.YEAR ? car.getYear() : car.getMileage();
             if (result.containsKey(indicator)){
                 result.get(indicator).add(car.getPrice());
             }else{
-                ArrayList<Integer> list = new ArrayList<>() {{ car.getPrice(); }};
+                int price = accordingGbo ? car.getPriceWithGbo() : car.getPrice();
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(price);
                 result.put(indicator, list);
             }
         }
@@ -52,11 +101,11 @@ public class CarAnalyze {
     }
 
     /**
-     * Average price
+     * Average price in all gradations
      *
      * @return HashMap<arg, price>
      */
-    public HashMap<Integer, Integer> averagePrice(Arg arg){
+    public HashMap<Integer, Integer> averagePriceByGradations(Arg arg){
         HashMap<Integer,Integer> result = new HashMap<>();
         HashMap <Integer, ArrayList<Integer>> priceDb = arg == Arg.YEAR ? yearPriceDb : mileagePriceDb;
 
@@ -80,5 +129,9 @@ public class CarAnalyze {
 
     public HashMap<Integer, ArrayList<Integer>> getMileagePriceDb() {
         return mileagePriceDb;
+    }
+
+    public int getMileageGradation() {
+        return MILEAGE_GRADATION;
     }
 }
