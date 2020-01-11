@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CarAnalyze {
+public class CarAnalyzer {
     private final int MILEAGE_GRADATION = 20;
 
     private ArrayList<CarCard> carsDb;
@@ -13,7 +13,7 @@ public class CarAnalyze {
 
     enum Arg { YEAR, MILEAGE, PRICE }
 
-    public CarAnalyze(ArrayList<CarCard> carsDb, boolean gbo) {
+    public CarAnalyzer(ArrayList<CarCard> carsDb, boolean gbo) {
         /* according to gbo */
         accordingGbo = gbo;
 

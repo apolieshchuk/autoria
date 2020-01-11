@@ -12,13 +12,12 @@ import java.util.regex.Pattern;
 
 public class CarsUrlReader {
 
-    private URL url;
     private Document document;
+
     private final boolean CARS_LOG = false;
 
     public CarsUrlReader(String urlString) throws IOException {
-        url = new URL(urlString);
-        document = getUrlDom(url);
+        document = getUrlDom(urlString);
     }
 
     /**
@@ -26,7 +25,7 @@ public class CarsUrlReader {
      *
      * @return max number of pages
      */
-    public int getTotalPages(){
+    public int getTotalPages(String urlString) throws IOException {
         try{
             String totalPages = document.select(".pager span:nth-last-child(3) a").text();
             totalPages = totalPages.replaceAll(" ","");
@@ -38,11 +37,13 @@ public class CarsUrlReader {
 
     /**
      * Get DOM from url
-     * @param url url -address
+     * @param urlString urlString -address
      * @return Document DOM
      * @throws IOException error
      */
-    public Document getUrlDom(URL url) throws IOException {
+    private Document getUrlDom(String urlString) throws IOException {
+        /* String to url */
+        URL url = new URL(urlString);
 
         /* Read html form url stream (commons-io-1.3.2.jar library) */
         String htmlString = IOUtils.toString(url.openStream());
@@ -130,14 +131,4 @@ public class CarsUrlReader {
         if (!m.find()) return "";
         return m.group(1);
     }
-
-    public void setUrl(String urlString) throws IOException {
-        this.url = new URL(urlString);
-        this.document = getUrlDom(url);
-    }
-
-    public URL getUrl() {
-        return url;
-    }
-
 }
