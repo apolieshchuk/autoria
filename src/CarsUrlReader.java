@@ -13,11 +13,13 @@ import java.util.regex.Pattern;
 public class CarsUrlReader {
 
     private Document document;
+    private ArrayList<CarCard> cars;
 
     private final boolean CARS_LOG = false;
 
     public CarsUrlReader(String urlString) throws IOException {
         document = getUrlDom(urlString);
+        cars = getCarsInUrl();
     }
 
     /**
@@ -25,7 +27,7 @@ public class CarsUrlReader {
      *
      * @return max number of pages
      */
-    public int getTotalPages(String urlString) throws IOException {
+    public int getTotalPages() throws IOException {
         try{
             String totalPages = document.select(".pager span:nth-last-child(3) a").text();
             totalPages = totalPages.replaceAll(" ","");
@@ -55,7 +57,7 @@ public class CarsUrlReader {
     /**
      * Get array list with cars class in url
      */
-    public ArrayList<CarCard> getCarsInUrl() {
+    private ArrayList<CarCard> getCarsInUrl() {
         /* Create arraylist of results */
         ArrayList<CarCard> cars = new ArrayList<>();
 
@@ -68,12 +70,13 @@ public class CarsUrlReader {
             /* Create CarCard class */
             CarCard car = new CarCard();
 
-            /* Title */
+            /* Title and url */
             Elements card_title = ticket.select(".ticket-title a");
             String title = card_title.attr("title");
-//            String title = cutInfoFromDiv("title=\"([^\"]+)", card_title);
+            String url = card_title.attr("href");
             if (CARS_LOG) System.out.println(title);
             car.setTitle(title);
+            car.setUrl(url);
 
             /* Price */
             Elements card_price = ticket.select(".price-ticket");
@@ -102,9 +105,11 @@ public class CarsUrlReader {
             if (CARS_LOG) System.out.println(fuel);
             car.setFuel(fuel);
 
-            /* Year */
-            Elements card_year = ticket.select("div:first-child");
-            String year = card_year.attr("data-year");
+            /* Auto year, mark and model */
+            Elements card_attr= ticket.select("div:first-child");
+            car.setMark(card_attr.attr("data-mark-name"));
+            car.setModel(card_attr.attr("data-model-name"));
+            String year = card_attr.attr("data-year");
             if (CARS_LOG) System.out.println(year);
             try {
                 car.setYear(Integer.parseInt(year));
@@ -130,5 +135,11 @@ public class CarsUrlReader {
         Matcher m = Pattern.compile(regex).matcher(div);
         if (!m.find()) return "";
         return m.group(1);
+    }
+
+    /* GETTERS & SETTERS */
+
+    public ArrayList<CarCard> getCars() {
+        return cars;
     }
 }

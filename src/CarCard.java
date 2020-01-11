@@ -11,6 +11,9 @@ public class CarCard implements Serializable {
     private int price;
     private int priceWithGbo;
     private Boolean gbo;
+    private String mark;
+    private String model;
+    private String url;
 
     /* Getters and setters*/
     public String getTitle() {
@@ -69,4 +72,29 @@ public class CarCard implements Serializable {
     public int getPriceWithGbo() {
         return priceWithGbo;
     }
+
+    public String getMark() {
+        return mark;
+    }
+
+    public void setMark(String mark) {
+        this.mark = mark;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 }

@@ -21,21 +21,21 @@ public class CarAnalyzer {
         this.carsDb = carsDb;
 
         /* Average auto price */
-        averageAutoPrice = avrageByAllAuto(Arg.PRICE);
+        averageAutoPrice = averageByAllAuto(Arg.PRICE);
 
         /* Average auto mileage */
-        averageAutoMileage = avrageByAllAuto(Arg.MILEAGE);
+        averageAutoMileage = averageByAllAuto(Arg.MILEAGE);
 
         /* year-price db */
-        this.yearPriceDb = priceDb(Arg.YEAR);
+        yearPriceDb = priceDb(Arg.YEAR);
 
         /* mileage-price db */
-        this.mileagePriceDb = priceDb(Arg.MILEAGE);
+        mileagePriceDb = priceDb(Arg.MILEAGE);
 
     }
 
     /* Average indicator for all cars */
-    private int avrageByAllAuto(Arg arg){
+    private int averageByAllAuto(Arg arg){
         int sum = 0;
         for (CarCard car : carsDb){
             int indicator = 0;
@@ -120,6 +120,36 @@ public class CarAnalyzer {
             }
         }
         return result;
+    }
+
+    /**
+     * Return average price by specific indicator
+     *
+     * @param arg indicator
+     * @return average price for this indicator from db
+     */
+    public int averagePriceByIndicator(Arg arg, int indicator){
+        HashMap <Integer, ArrayList<Integer>> priceDb;
+        switch (arg){
+            case YEAR:
+                priceDb = yearPriceDb;
+                break;
+            case MILEAGE:
+                priceDb = mileagePriceDb;
+                indicator = nearestGradation(indicator);
+                break;
+            default:
+                priceDb = new HashMap<>();
+        }
+
+        /* Get pricelist for current indicator */
+        ArrayList<Integer> priceList = priceDb.get(indicator);
+
+        /* Calc average */
+        int sum = 0;
+        for (Integer price : priceList) sum += price;
+
+        return sum / priceList.size();
     }
 
     /* GETTERS & SETTERS */
