@@ -2,15 +2,15 @@ import java.io.Serializable;
 
 public class CarCard implements Serializable {
 
+    private final int GBO_PRICE = 500;
+
     private String title;
     private int mileage;
     private String fuel;
     private int year;
     private int price;
-
-    public CarCard() {
-
-    }
+    private int priceWithGbo;
+    private Boolean gbo;
 
     /* Getters and setters*/
     public String getTitle() {
@@ -33,6 +33,10 @@ public class CarCard implements Serializable {
         return price;
     }
 
+    public Boolean getGbo() {
+        return gbo;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -43,6 +47,15 @@ public class CarCard implements Serializable {
 
     public void setFuel(String fuel) {
         this.fuel = fuel;
+
+        /* Did auto have gbo? */
+        gbo = fuel.toLowerCase().contains("газ");
+
+        /* Auto price with/wo gbo */
+        if (gbo){
+            priceWithGbo = this.price;
+            price = priceWithGbo - GBO_PRICE;
+        }
     }
 
     public void setYear(int year) {
@@ -51,5 +64,9 @@ public class CarCard implements Serializable {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public int getPriceWithGbo() {
+        return priceWithGbo;
     }
 }
