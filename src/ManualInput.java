@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
+public class ManualInput {
 
     private static final String DB_PATH = "static/autoDb/";
     private static String auto;
