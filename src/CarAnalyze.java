@@ -44,7 +44,7 @@ public class CarAnalyze {
             if (result.containsKey(indicator)){
                 result.get(indicator).add(car.getPrice());
             }else{
-                ArrayList<Integer> list = new ArrayList<>() {{ car.getPrice(); }};
+                ArrayList<Integer> list = new ArrayList<Integer>() {{ car.getPrice(); }};
                 result.put(indicator, list);
             }
         }
