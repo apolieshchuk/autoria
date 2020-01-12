@@ -23,7 +23,7 @@ public class CarsDb {
      * @throws IOException            sad shit
      * @throws ClassNotFoundException very sad shit
      */
-    public ArrayList<CarCard> getCarInfo(String mark, String model, boolean fromDatabase)
+    public CarsList<Car> getCarInfo(String mark, String model, boolean fromDatabase)
             throws IOException, ClassNotFoundException {
 
         /* If mark or model in kyril transliterate to latin */
@@ -41,7 +41,7 @@ public class CarsDb {
         CarsUrlReader autoRiaReader = new CarsUrlReader(startUrl);
 
         /* Main db of all cars */
-        ArrayList<CarCard> carsDb = new ArrayList<>();
+        CarsList<Car> carsDb = new CarsList<>();
 
         /* DB file */
         File file = new File(DB_PATH + mark + "_" + model + ".arf");
@@ -75,7 +75,7 @@ public class CarsDb {
      * @param carsDb auto's database
      * @param file   path to file
      */
-    private void writeInDb(ArrayList<CarCard> carsDb, File file) throws IOException {
+    private void writeInDb(CarsList<Car> carsDb, File file) throws IOException {
         FileOutputStream fos = new FileOutputStream(file);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(carsDb);
@@ -87,10 +87,10 @@ public class CarsDb {
      *
      * @param file file *.arf
      */
-    private ArrayList<CarCard> readFromDb(File file) throws IOException, ClassNotFoundException {
+    private CarsList<Car> readFromDb(File file) throws IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(file);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        ArrayList<CarCard> carsDb = (ArrayList<CarCard>) ois.readObject();
+        CarsList<Car> carsDb = (CarsList<Car>) ois.readObject();
         ois.close();
         return carsDb;
     }
@@ -114,4 +114,6 @@ public class CarsDb {
         }
         return builder.toString();
     }
+
 }
+

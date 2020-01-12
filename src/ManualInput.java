@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 
 public class ManualInput {
@@ -20,7 +19,7 @@ public class ManualInput {
         gbo = args[4].toLowerCase().contains("gbo");
 
         /* Get info about car */
-        ArrayList<CarCard> carsDb = new CarsDb().getCarInfo(mark, model, true);
+        CarsList<Car> carsDb = new CarsDb().getCarInfo(mark, model, true);
 
         /* Analyze auto db */
         printCarAnalyze(carsDb);
@@ -31,7 +30,7 @@ public class ManualInput {
      *
      * @param carsDb array list of cars of the same models
      */
-    private static void printCarAnalyze(ArrayList<CarCard> carsDb) {
+    private static void printCarAnalyze(CarsList<Car> carsDb) {
         CarAnalyzer analyzer = new CarAnalyzer(carsDb, gbo);
 
         System.out.printf("Average price for %s %s %dг. %d тыс км ГБО - %b:\n ",

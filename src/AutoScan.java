@@ -1,10 +1,15 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.stream.IntStream;
 
 public class AutoScan {
 
-    private static final int SCAN_LAST_AUTO = 5;
+    /*Error message */
+    private static final String ANSI_RED = "\u001B[31m"; // color changers for console text
+    private static final String ANSI_RESET = "\u001B[0m"; // color changers for console text
+    private static final String ANSI_GREEN = "\033[0;32m"; // color changers for console text
+
+    private static final int SCAN_LAST_AUTO = 50;
 
     private static final String FILTER_URL = "https://auto.ria.com/search/?year[0].gte=2008&categories.main.id=1&" +
             "region.id[0]=16&city.id[0]=16&price.USD.lte=7000&price.currency=1&" +
@@ -13,42 +18,78 @@ public class AutoScan {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         /* Get auto in filtered url */
-        ArrayList<CarCard> newAutos = new CarsUrlReader(FILTER_URL).getCars();
+        CarsList<Car> newAutos = new CarsUrlReader(FILTER_URL).getCars();
 
         /* For every auto */
         int counter = 1;
-        for (CarCard car : newAutos) {
+        for (Car car : newAutos) {
 
             /* Get database for auto mark and model */
-            ArrayList<CarCard> autoDb = new CarsDb().getCarInfo(car.getMark(),car.getModel(),true);
+            CarsList<Car> autoDb = new CarsDb().getCarInfo(car.getMark(),car.getModel(),true);
 
             /* Analyzer */
             CarAnalyzer analyzer = new CarAnalyzer(autoDb, car.getGbo());
 
             /* Year - average price */
-            int averagePriceThisYear = analyzer.averagePriceByIndicator(CarAnalyzer.Arg.YEAR, car.getYear());
-            int averagePricePlusYear = analyzer.averagePriceByIndicator(CarAnalyzer.Arg.YEAR, car.getYear() + 1);
-            int averagePriceMinusYear = analyzer.averagePriceByIndicator(CarAnalyzer.Arg.YEAR, car.getYear() - 1);
-            int averagePriceYear = (averagePriceThisYear + averagePricePlusYear + averagePriceMinusYear) / 3;
+            int averagePriceYear = calcAveragePrice(car, analyzer, CarAnalyzer.Arg.YEAR);
 
             /* Mileage - average price */
-            int averagePriceThisMileage = analyzer.averagePriceByIndicator(CarAnalyzer.Arg.MILEAGE, car.getMileage());
-            int averagePricePlusMileage = analyzer.averagePriceByIndicator(CarAnalyzer.Arg.MILEAGE,
-                    car.getMileage() + analyzer.getMileageGradation());
-            int averagePriceMinusMileage = analyzer.averagePriceByIndicator(CarAnalyzer.Arg.MILEAGE,
-                    car.getMileage() - analyzer.getMileageGradation());
-            int averagePriceMileage = (averagePriceThisMileage + averagePricePlusMileage + averagePriceMinusMileage) / 3;
+            int averagePriceMileage = calcAveragePrice(car, analyzer, CarAnalyzer.Arg.MILEAGE);
 
             /* Print log */
+            if (car.getPrice() < averagePriceMileage && car.getPrice() < averagePriceYear ){
+                System.out.println(ANSI_GREEN);
+            }
             System.out.printf("%d. %s %s %d$ %d г. %d тыс.км ГБО - %b\n",
                     counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice(),
                     car.getYear(), car.getMileage(), car.getGbo());
             System.out.printf("   Average price buy year - %d$\n", averagePriceYear);
             System.out.printf("   Average price buy mileage - %d$\n", averagePriceMileage);
-            System.out.println("   " + car.getUrl());
+            System.out.println("   " + car.getUrl() + ANSI_RESET);
 
             counter++;
         }
+    }
+
+    /**
+     * Calculate average price for arg
+     *
+     * @param car car
+     * @param analyzer analyzer
+     * @param arg Year or Mileage
+     * @return counted average price
+     */
+    private static int calcAveragePrice(Car car, CarAnalyzer analyzer, CarAnalyzer.Arg arg) {
+
+        /* Get indicators according to arg */
+        int indicator = 0;
+        int increment = 0;
+        switch (arg){
+            case YEAR:
+                indicator = car.getYear();
+                increment = 1;
+                break;
+            case MILEAGE:
+                indicator = car.getMileage();
+                increment = analyzer.getMileageGradation();
+                break;
+        }
+
+        /* Get Plus and Minus indicators */
+        int [] averagePrices = new int[] {
+                analyzer.averagePriceByIndicator(arg, indicator),
+                analyzer.averagePriceByIndicator(arg, indicator + increment),
+                analyzer.averagePriceByIndicator(arg, indicator - increment)
+        };
+
+        /* Count correct results */
+        int correctResults = 0;
+        for (int i: averagePrices) if (i != 0) correctResults++;
+
+        /* Count sum */
+        int sum = IntStream.of(averagePrices).sum();
+
+        return correctResults != 0 ? sum / correctResults : 0;
     }
 
 }

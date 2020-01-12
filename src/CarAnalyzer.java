@@ -4,27 +4,19 @@ import java.util.HashMap;
 public class CarAnalyzer {
     private final int MILEAGE_GRADATION = 20;
 
-    private ArrayList<CarCard> carsDb;
+    private CarsList<Car> carsDb;
     private boolean accordingGbo;
-    private int averageAutoPrice;
-    private int averageAutoMileage;
     private HashMap <Integer, ArrayList<Integer>> yearPriceDb;
     private HashMap <Integer, ArrayList<Integer>> mileagePriceDb;
 
     enum Arg { YEAR, MILEAGE, PRICE }
 
-    public CarAnalyzer(ArrayList<CarCard> carsDb, boolean gbo) {
+    public CarAnalyzer(CarsList<Car> carsDb, boolean gbo) {
         /* according to gbo */
         accordingGbo = gbo;
 
         /* Main db for analyze */
         this.carsDb = carsDb;
-
-        /* Average auto price */
-        averageAutoPrice = averageByAllAuto(Arg.PRICE);
-
-        /* Average auto mileage */
-        averageAutoMileage = averageByAllAuto(Arg.MILEAGE);
 
         /* year-price db */
         yearPriceDb = priceDb(Arg.YEAR);
@@ -32,26 +24,6 @@ public class CarAnalyzer {
         /* mileage-price db */
         mileagePriceDb = priceDb(Arg.MILEAGE);
 
-    }
-
-    /* Average indicator for all cars */
-    private int averageByAllAuto(Arg arg){
-        int sum = 0;
-        for (CarCard car : carsDb){
-            int indicator = 0;
-            switch (arg){
-                case YEAR:
-                    break;
-                case MILEAGE:
-                    indicator = car.getMileage();
-                    break;
-                case PRICE:
-                    indicator = car.getPrice();
-                    break;
-            }
-            sum += indicator;
-        }
-        return sum / carsDb.size();
     }
 
     /**
@@ -71,10 +43,15 @@ public class CarAnalyzer {
      */
     private  HashMap <Integer, ArrayList<Integer>> priceDb(Arg arg){
         HashMap <Integer, ArrayList<Integer>> result = new HashMap<>();
-        for (CarCard car: carsDb) {
+
+        int a = carsDb.getPriceAverage(); // TODO: 12.01.2020 FILTER WHEN INCOME 100000$
+
+        for (Car car: carsDb) {
+
             /* Bad price and mileage filter */
-            if (car.getPrice() > averageAutoPrice * 2 || car.getPrice() < averageAutoPrice / 2) continue;
-            if (car.getMileage() > averageAutoMileage * 2) continue;
+            if (car.getPrice() > carsDb.getPriceAverage() * 2 || car.getPrice() < carsDb.getPriceAverage() / 2) continue;
+            if (car.getMileage() > carsDb.getMileageAverage() * 2) continue;
+
 
             /* Get indicator */
             int indicator = 0;
@@ -89,7 +66,8 @@ public class CarAnalyzer {
 
             /* Fill in hashmap */
             if (result.containsKey(indicator)){
-                result.get(indicator).add(car.getPrice());
+                ArrayList<Integer> priceList = result.get(indicator);
+                priceList.add(car.getPrice());
             }else{
                 int price = accordingGbo ? car.getPriceWithGbo() : car.getPrice();
                 ArrayList<Integer> list = new ArrayList<>();
@@ -142,14 +120,22 @@ public class CarAnalyzer {
                 priceDb = new HashMap<>();
         }
 
-        /* Get pricelist for current indicator */
-        ArrayList<Integer> priceList = priceDb.get(indicator);
+        try{
+            /* Get pricelist for current indicator */
+            ArrayList<Integer> priceList;
 
-        /* Calc average */
-        int sum = 0;
-        for (Integer price : priceList) sum += price;
+            priceList = priceDb.get(indicator);
 
-        return sum / priceList.size();
+            /* Calc average */
+            int sum = 0;
+            for (Integer price : priceList) sum += price;
+
+            return sum / priceList.size();
+
+        } catch (Exception e){
+            return 0;
+        }
+
     }
 
     /* GETTERS & SETTERS */

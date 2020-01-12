@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class CarCard implements Serializable {
+public class Car implements Serializable {
 
     private final int GBO_PRICE = 500;
 

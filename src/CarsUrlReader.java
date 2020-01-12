@@ -5,15 +5,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CarsUrlReader {
 
     private Document document;
-    private ArrayList<CarCard> cars;
+    private CarsList<Car> cars;
 
     private final boolean CARS_LOG = false;
 
@@ -57,9 +59,10 @@ public class CarsUrlReader {
     /**
      * Get array list with cars class in url
      */
-    private ArrayList<CarCard> getCarsInUrl() {
+    private CarsList<Car> getCarsInUrl() {
+
         /* Create arraylist of results */
-        ArrayList<CarCard> cars = new ArrayList<>();
+        CarsList<Car> cars = new CarsList<>();
 
         /* Get all cars-cards in html */
         Elements tickets = document.body().getElementsByClass("ticket-item");
@@ -68,7 +71,7 @@ public class CarsUrlReader {
         for (Element ticket : tickets) {
 
             /* Create CarCard class */
-            CarCard car = new CarCard();
+            Car car = new Car();
 
             /* Title and url */
             Elements card_title = ticket.select(".ticket-title a");
@@ -81,12 +84,11 @@ public class CarsUrlReader {
             /* Price */
             Elements card_price = ticket.select(".price-ticket");
             String price = card_price.attr("data-main-price");
-//            String price = cutInfoFromDiv("data-main-price=\"([^\"]+)", card_price);
             if (CARS_LOG) System.out.println(price + "$");
             try {
                 car.setPrice(Integer.parseInt(price));
             } catch (Exception e) {
-                car.setPrice(0);
+                continue;
             }
 
             /* Mileage */
@@ -139,7 +141,63 @@ public class CarsUrlReader {
 
     /* GETTERS & SETTERS */
 
-    public ArrayList<CarCard> getCars() {
+    public CarsList<Car> getCars() {
         return cars;
     }
+}
+
+class CarsList<E> extends ArrayList<E> implements Serializable {
+
+    private int mileageAverage = 0;
+    private int priceAverage = 0;
+    private int priceSum = 0;
+    private int mileageSum = 0;
+
+    public CarsList() {
+        super();
+    }
+
+    @Override
+    public boolean add(E e) {
+
+        /* Cast */
+        Car car = (Car) e;
+
+        /* Price average */
+        priceSum += car.getPrice();
+        priceAverage = priceSum / (this.size() + 1);
+
+        /* Mileage average */
+        mileageSum += car.getMileage();
+        mileageAverage = mileageSum / (this.size() + 1);
+
+        return super.add(e);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        /* Cast */
+        CarsList<E> carList = (CarsList<E>) c;
+
+        /* Price average */
+        priceSum += carList.priceSum;
+        priceAverage = priceSum / (this.size() + c.size());
+
+        /* Mileage average */
+        mileageSum += carList.mileageSum;
+        mileageAverage = mileageSum / (this.size() + c.size());
+
+        return super.addAll(c);
+    }
+
+    /* Getters */
+
+    public int getMileageAverage() {
+        return mileageAverage;
+    }
+
+    public int getPriceAverage() {
+        return priceAverage;
+    }
+
 }
