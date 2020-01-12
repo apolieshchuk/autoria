@@ -55,10 +55,8 @@ public class Car implements Serializable {
         gbo = fuel.toLowerCase().contains("газ");
 
         /* Auto price with/wo gbo */
-        if (gbo){
-            priceWithGbo = this.price;
-            price = priceWithGbo - GBO_PRICE;
-        }
+        priceWithGbo = this.price;
+        if (gbo) price = priceWithGbo - GBO_PRICE;
     }
 
     public void setYear(int year) {
@@ -96,5 +94,10 @@ public class Car implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    public int getGboPrice() {
+        return GBO_PRICE;
+    }
+
 
 }

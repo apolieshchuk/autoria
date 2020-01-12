@@ -9,7 +9,7 @@ public class AutoScan {
     private static final String ANSI_RESET = "\u001B[0m"; // color changers for console text
     private static final String ANSI_GREEN = "\033[0;32m"; // color changers for console text
 
-    private static final int SCAN_LAST_AUTO = 50;
+    private static final int SCAN_LAST_AUTO = 5;
 
     private static final String FILTER_URL = "https://auto.ria.com/search/?year[0].gte=2008&categories.main.id=1&" +
             "region.id[0]=16&city.id[0]=16&price.USD.lte=7000&price.currency=1&" +
@@ -38,13 +38,14 @@ public class AutoScan {
 
             /* Print log */
             if (car.getPrice() < averagePriceMileage && car.getPrice() < averagePriceYear ){
-                System.out.println(ANSI_GREEN);
+                System.out.print(ANSI_GREEN);
             }
+            int increment = car.getGbo() ? car.getGboPrice() : 0;
             System.out.printf("%d. %s %s %d$ %d г. %d тыс.км ГБО - %b\n",
-                    counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice(),
+                    counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice() + increment,
                     car.getYear(), car.getMileage(), car.getGbo());
-            System.out.printf("   Average price buy year - %d$\n", averagePriceYear);
-            System.out.printf("   Average price buy mileage - %d$\n", averagePriceMileage);
+            System.out.printf("   Average price per year - %d$\n", averagePriceYear + increment);
+            System.out.printf("   Average price per mileage - %d$\n", averagePriceMileage + increment);
             System.out.println("   " + car.getUrl() + ANSI_RESET);
 
             counter++;
