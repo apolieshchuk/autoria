@@ -10,9 +10,6 @@ public class CarsDb {
     /* Path to db */
     private final String DB_PATH = "static/autoDb/";
 
-    /* Auto's in page */
-    private final int AUTO_IN_PAGE = 20;
-
     /**
      * Get info about car's
      *
@@ -49,16 +46,21 @@ public class CarsDb {
         /* Try find db in static db */
         if (file.exists() && fromDatabase) carsDb = readFromDb(file);
 
-        /* Get total pages of this cars model/mark */
+        /* Get total pages of this cars model/mark
+        *  WARNING!!! Total pages for 20 per/page */
         int totalPages = autoRiaReader.getTotalPages();
 
         /* Parse all pages and get cars on it if we don't have already db */
         if (carsDb.size() == 0) {
-            for (int i = 1; i < totalPages; i++) {
-                carsDb.addAll(autoRiaReader.getCars());
-                autoRiaReader = new CarsUrlReader(startUrl + "?page=" + i);
+            /* Auto's in page when directing
+             * WARNING !!! when go on num page default there- 10 auto FOREVER */
+            int AUTO_IN_PAGE = 10;
+            for (int i = 1; i < totalPages * 2; i++) { // *2 bc default 10 cars on page
+                CarsList<Car> carsOnPage = autoRiaReader.getCars();
+                carsDb.addAll(carsOnPage);
+                autoRiaReader = new CarsUrlReader(startUrl + "/?page=" + i);
                 System.out.printf("\r%d/%d auto's %s %s",
-                        i * AUTO_IN_PAGE, (totalPages - 1) * AUTO_IN_PAGE, mark, model);
+                        (i + 1) * AUTO_IN_PAGE, totalPages * 2 * AUTO_IN_PAGE, mark, model);
             }
             System.out.println();
         }

@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 
@@ -9,11 +10,11 @@ public class AutoScan {
     private static final String ANSI_RESET = "\u001B[0m"; // color changers for console text
     private static final String ANSI_GREEN = "\033[0;32m"; // color changers for console text
 
-    private static final int SCAN_LAST_AUTO = 10;
+    private static final int SCAN_LAST_AUTO = 5;
 
     private static final String FILTER_URL = "https://auto.ria.com/search/?year[0].gte=2008&categories.main.id=1&" +
-            "region.id[0]=16&city.id[0]=16&price.USD.lte=7000&price.currency=1&" +
-            "sort[0].order=dates.created.desc&abroad.not=0&custom.not=1&page=0&size=" + SCAN_LAST_AUTO;
+            "region.id[0]=16&city.id[0]=16&price.USD.lte=7000&price.currency=1&sort[0].order=dates.created.desc&" +
+            "abroad.not=0&custom.not=1&page=0&size=" + SCAN_LAST_AUTO;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 

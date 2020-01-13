@@ -98,7 +98,7 @@ public class CarsUrlReader {
             try {
                 car.setMileage(Integer.parseInt(mileage));
             } catch (Exception e) {
-                car.setMileage(0);
+                continue;
             }
 
             /* Fuel */

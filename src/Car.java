@@ -4,7 +4,10 @@ public class Car implements Serializable {
 
     private final int GBO_PRICE = 500;
 
+    private static int id_counter = 1;
+
     private String title;
+    private int id;
     private int mileage;
     private String fuel;
     private int year;
@@ -14,6 +17,11 @@ public class Car implements Serializable {
     private String mark;
     private String model;
     private String url;
+
+    public Car() {
+        id = id_counter;
+        id_counter++;
+    }
 
     /* Getters and setters*/
     public String getTitle() {

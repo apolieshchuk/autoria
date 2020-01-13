@@ -52,7 +52,6 @@ public class CarAnalyzer {
             if (car.getPrice() > carsDb.getPriceAverage() * 2 || car.getPrice() < carsDb.getPriceAverage() / 2) continue;
             if (car.getMileage() > carsDb.getMileageAverage() * 2) continue;
 
-
             /* Get indicator */
             int indicator = 0;
             switch (arg){
