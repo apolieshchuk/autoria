@@ -31,7 +31,7 @@ public class CarsDb {
         }
         if (Pattern.matches(".*\\p{InCyrillic}.*", model)){
             model = transliterate(model);
-            model = model.replaceAll(" ", "-");
+            // model = model.replaceAll(" ", "-");
         }
 
         /* Add mark and model to main route */
@@ -60,7 +60,7 @@ public class CarsDb {
             int AUTO_IN_PAGE = 10;
             for (int i = 1; i < totalPages * 2; i++) { // *2 bc default 10 cars on page
                 CarsList<Car> carsOnPage = autoRiaReader.getCars();
-                carsDb.addAll(carsOnPage);
+                if (carsOnPage != null ) carsDb.addAll(carsOnPage);
                 autoRiaReader = new CarsUrlReader(markURL + "/?page=" + i);
                 System.out.printf("\r%d/%d auto's %s %s",
                         (i + 1) * AUTO_IN_PAGE, totalPages * 2 * AUTO_IN_PAGE, mark, model);

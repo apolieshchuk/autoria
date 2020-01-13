@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,23 +44,30 @@ public class CarsUrlReader {
      * Get DOM from url
      * @param urlString urlString -address
      * @return Document DOM
-     * @throws IOException error
      */
-    private Document getUrlDom(String urlString) throws IOException {
+    private Document getUrlDom(String urlString) throws MalformedURLException {
         /* String to url */
         URL url = new URL(urlString);
 
         /* Read html form url stream (commons-io-1.3.2.jar library) */
-        String htmlString = IOUtils.toString(url.openStream());
+        try {
+            String htmlString = IOUtils.toString(url.openStream());
 
-        /* Get DOM Html (jsoup-1.12.1.jar library)*/
-        return Jsoup.parse(htmlString);
+            /* Get DOM Html (jsoup-1.12.1.jar library)*/
+            return Jsoup.parse(htmlString);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
      * Get array list with cars class in url
      */
     private CarsList<Car> getCarsInUrl() {
+
+        if (document == null)  return null;
 
         /* Create arraylist of results */
         CarsList<Car> cars = new CarsList<>();
