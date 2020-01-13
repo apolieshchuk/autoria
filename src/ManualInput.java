@@ -38,23 +38,23 @@ public class ManualInput {
         System.out.println("----------------------------------------------");
 
         /* Year - average price */
-        HashMap<Integer, Integer> yearAveragePrice = analyzer.averagePriceByGradations(CarAnalyzer.Arg.YEAR);
-        System.out.printf("Average price: %d г. - %d$\n", year, yearAveragePrice.get(year));
-        System.out.printf("Average price: %d г. - %d$\n", year - 1, yearAveragePrice.get(year - 1));
-        System.out.printf("Average price: %d г. - %d$\n", year + 1, yearAveragePrice.get(year + 1));
+        System.out.printf("Average price: %d г. - %d$\n",
+                year, analyzer.averagePriceByIndicator(CarAnalyzer.Arg.YEAR,year));
+        System.out.printf("Average price: %d г. - %d$\n",
+                year-1, analyzer.averagePriceByIndicator(CarAnalyzer.Arg.YEAR,year-1));
+        System.out.printf("Average price: %d г. - %d$\n",
+                year+1, analyzer.averagePriceByIndicator(CarAnalyzer.Arg.YEAR,year+1));
 
         System.out.println("----------------------------------------------");
 
-        /* Mileage - average price */
-        HashMap<Integer, Integer> mileageAveragePrice = analyzer.averagePriceByGradations(CarAnalyzer.Arg.MILEAGE);
-        System.out.printf("Price: до %d тыс.км - %d$\n",
-                mileage, mileageAveragePrice.get(analyzer.nearestGradation(mileage)));
-        /* - mileage */
-        int minusMileage = analyzer.nearestGradation(mileage - analyzer.getMileageGradation());
-        System.out.printf("Price: до %d тыс.км - %d$\n", minusMileage, mileageAveragePrice.get(minusMileage));
-        /* + mileage */
-        int plusMileage = analyzer.nearestGradation( mileage + analyzer.getMileageGradation());
-        System.out.printf("Price: до %d тыс.км - %d$\n", plusMileage, mileageAveragePrice.get(plusMileage));
+        System.out.printf("Average price: %d тыс.км - %d$\n",
+                mileage, analyzer.averagePriceByIndicator(CarAnalyzer.Arg.MILEAGE, mileage));
+        int mileageMinus = mileage - analyzer.getMileageGradation();
+        System.out.printf("Average price: %d тыс.км - %d$\n",
+                mileageMinus, analyzer.averagePriceByIndicator(CarAnalyzer.Arg.MILEAGE,mileageMinus));
+        int mileagePlus = mileage + analyzer.getMileageGradation();
+        System.out.printf("Average price: %d тыс.км - %d$\n",
+                mileagePlus, analyzer.averagePriceByIndicator(CarAnalyzer.Arg.MILEAGE,mileagePlus));
 
     }
 }

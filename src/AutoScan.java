@@ -10,9 +10,11 @@ public class AutoScan {
     private static final String ANSI_RESET = "\u001B[0m"; // color changers for console text
     private static final String ANSI_GREEN = "\033[0;32m"; // color changers for console text
 
-    private static final int SCAN_LAST_AUTO = 5;
+    private static final int SCAN_LAST_AUTO = 10;
+    private static final int YEAR = 2008;
 
-    private static final String FILTER_URL = "https://auto.ria.com/search/?year[0].gte=2008&categories.main.id=1&" +
+    private static final String FILTER_URL = "https://auto.ria.com/search/?year[0].gte=" + YEAR
+            + "&categories.main.id=1&" +
             "region.id[0]=16&city.id[0]=16&price.USD.lte=7000&price.currency=1&sort[0].order=dates.created.desc&" +
             "abroad.not=0&custom.not=1&page=0&size=" + SCAN_LAST_AUTO;
 
@@ -26,7 +28,7 @@ public class AutoScan {
         for (Car car : newAutos) {
 
             /* Get database for auto mark and model */
-            CarsList<Car> autoDb = new CarsDb().getCarInfo(car.getMark(),car.getModel(),true);
+            CarsList<Car> autoDb = CarsDb.getCarInfo(car.getMark(),car.getModel(),true);
 
             /* Analyzer */
             CarAnalyzer analyzer = new CarAnalyzer(autoDb, car.getGbo());
@@ -41,12 +43,11 @@ public class AutoScan {
             if (car.getPrice() < averagePriceMileage && car.getPrice() < averagePriceYear ){
                 System.out.print(ANSI_GREEN);
             }
-            int increment = car.getGbo() ? car.getGboPrice() : 0;
             System.out.printf("%d. %s %s %d$ %d г. %d тыс.км ГБО - %b\n",
-                    counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice() + increment,
+                    counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice(),
                     car.getYear(), car.getMileage(), car.getGbo());
-            System.out.printf("   Average price per year - %d$\n", averagePriceYear + increment);
-            System.out.printf("   Average price per mileage - %d$\n", averagePriceMileage + increment);
+            System.out.printf("   Average price per year - %d$\n", averagePriceYear);
+            System.out.printf("   Average price per mileage - %d$\n", averagePriceMileage);
             System.out.println("   " + car.getUrl() + ANSI_RESET);
 
             counter++;

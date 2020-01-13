@@ -4,11 +4,13 @@ import java.util.regex.Pattern;
 
 public class CarsDb {
 
+    private static final int GBO_PRICE = 500;
+
     /* Main url route */
-    private String startUrl = "https://auto.ria.com/legkovie/";
+    private static String startUrl = "https://auto.ria.com/legkovie/";
 
     /* Path to db */
-    private final String DB_PATH = "static/autoDb/";
+    private static final String DB_PATH = "static/autoDb/";
 
     /**
      * Get info about car's
@@ -20,7 +22,7 @@ public class CarsDb {
      * @throws IOException            sad shit
      * @throws ClassNotFoundException very sad shit
      */
-    public CarsList<Car> getCarInfo(String mark, String model, boolean fromDatabase)
+    public static CarsList<Car> getCarInfo(String mark, String model, boolean fromDatabase)
             throws IOException, ClassNotFoundException {
 
         /* If mark or model in kyril transliterate to latin */
@@ -29,13 +31,14 @@ public class CarsDb {
         }
         if (Pattern.matches(".*\\p{InCyrillic}.*", model)){
             model = transliterate(model);
+            model = model.replaceAll(" ", "-");
         }
 
         /* Add mark and model to main route */
-        startUrl += mark + "/" + model;
+        String markURL = startUrl + mark + "/" + model;
 
         /* Create autoria reader */
-        CarsUrlReader autoRiaReader = new CarsUrlReader(startUrl);
+        CarsUrlReader autoRiaReader = new CarsUrlReader(markURL);
 
         /* Main db of all cars */
         CarsList<Car> carsDb = new CarsList<>();
@@ -58,7 +61,7 @@ public class CarsDb {
             for (int i = 1; i < totalPages * 2; i++) { // *2 bc default 10 cars on page
                 CarsList<Car> carsOnPage = autoRiaReader.getCars();
                 carsDb.addAll(carsOnPage);
-                autoRiaReader = new CarsUrlReader(startUrl + "/?page=" + i);
+                autoRiaReader = new CarsUrlReader(markURL + "/?page=" + i);
                 System.out.printf("\r%d/%d auto's %s %s",
                         (i + 1) * AUTO_IN_PAGE, totalPages * 2 * AUTO_IN_PAGE, mark, model);
             }
@@ -77,7 +80,7 @@ public class CarsDb {
      * @param carsDb auto's database
      * @param file   path to file
      */
-    private void writeInDb(CarsList<Car> carsDb, File file) throws IOException {
+    private static void writeInDb(CarsList<Car> carsDb, File file) throws IOException {
         FileOutputStream fos = new FileOutputStream(file);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(carsDb);
@@ -89,7 +92,7 @@ public class CarsDb {
      *
      * @param file file *.arf
      */
-    private CarsList<Car> readFromDb(File file) throws IOException, ClassNotFoundException {
+    private static CarsList<Car> readFromDb(File file) throws IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(file);
         ObjectInputStream ois = new ObjectInputStream(fis);
         CarsList<Car> carsDb = (CarsList<Car>) ois.readObject();
@@ -117,5 +120,8 @@ public class CarsDb {
         return builder.toString();
     }
 
+    public static int getGboPrice() {
+        return GBO_PRICE;
+    }
 }
 

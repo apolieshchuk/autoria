@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CarAnalyzer {
+
     private final int MILEAGE_GRADATION = 20;
 
     private CarsList<Car> carsDb;
@@ -44,8 +45,6 @@ public class CarAnalyzer {
     private  HashMap <Integer, ArrayList<Integer>> priceDb(Arg arg){
         HashMap <Integer, ArrayList<Integer>> result = new HashMap<>();
 
-        int a = carsDb.getPriceAverage(); // TODO: 12.01.2020 FILTER WHEN INCOME 100000$
-
         for (Car car: carsDb) {
 
             /* Bad price and mileage filter */
@@ -64,11 +63,11 @@ public class CarAnalyzer {
             }
 
             /* Fill in hashmap */
+            int price = accordingGbo ? car.getPriceWOGbo() + CarsDb.getGboPrice() : car.getPriceWOGbo();
             if (result.containsKey(indicator)){
                 ArrayList<Integer> priceList = result.get(indicator);
-                priceList.add(car.getPrice());
+                priceList.add(price);
             }else{
-                int price = accordingGbo ? car.getPriceWithGbo() : car.getPrice();
                 ArrayList<Integer> list = new ArrayList<>();
                 list.add(price);
                 result.put(indicator, list);
@@ -149,4 +148,6 @@ public class CarAnalyzer {
     public int getMileageGradation() {
         return MILEAGE_GRADATION;
     }
+
+
 }

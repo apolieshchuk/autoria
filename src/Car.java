@@ -2,8 +2,6 @@ import java.io.Serializable;
 
 public class Car implements Serializable {
 
-    private final int GBO_PRICE = 500;
-
     private static int id_counter = 1;
 
     private String title;
@@ -12,7 +10,7 @@ public class Car implements Serializable {
     private String fuel;
     private int year;
     private int price;
-    private int priceWithGbo;
+    private int priceWOGbo;
     private Boolean gbo;
     private String mark;
     private String model;
@@ -63,8 +61,8 @@ public class Car implements Serializable {
         gbo = fuel.toLowerCase().contains("газ");
 
         /* Auto price with/wo gbo */
-        priceWithGbo = this.price;
-        if (gbo) price = priceWithGbo - GBO_PRICE;
+        priceWOGbo = this.price;
+        if (gbo) priceWOGbo -= CarsDb.getGboPrice();
     }
 
     public void setYear(int year) {
@@ -75,8 +73,8 @@ public class Car implements Serializable {
         this.price = price;
     }
 
-    public int getPriceWithGbo() {
-        return priceWithGbo;
+    public int getPriceWOGbo() {
+        return priceWOGbo;
     }
 
     public String getMark() {
@@ -102,10 +100,5 @@ public class Car implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    public int getGboPrice() {
-        return GBO_PRICE;
-    }
-
 
 }
