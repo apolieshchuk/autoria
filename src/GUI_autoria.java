@@ -5,18 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PrinterException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 
-public class GUI_autoria extends JFrame implements ActionListener {
+public class GUI_autoria extends JFrame implements ActionListener, Constants {
 
-    private static final int WINDOW_WIDTH = 900;
-    private static final int WINDOW_HEIGHT = 600;
     private static final int WINDOW_MARGIN_X = 150;
     private static final int WINDOW_MARGIN_Y = 50;
 
     private JPanel mainContainer;
-    private JScrollPane console;
+    private MyConsole myConsole;
 
     /* Auto Input */
     private JLabel labelNumOfAuto = new JLabel("Scanned auto:");
@@ -54,8 +51,7 @@ public class GUI_autoria extends JFrame implements ActionListener {
         this.add(mainContainer);
 
         // left panel
-        console = new JScrollPane(new Console(WINDOW_WIDTH / 3, WINDOW_HEIGHT));
-        //mainContainer.add(console, BorderLayout.WEST);
+        mainContainer.add(MyConsole.cmd(), BorderLayout.WEST);
 
         // right interact menu
         mainContainer.add(createRightMenu(), BorderLayout.EAST);
@@ -127,18 +123,13 @@ public class GUI_autoria extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e){
         if (e.getSource() == buttonAutoScan){
+            MyConsole.clear();
             AutoScan as = new AutoScan(Integer.parseInt(inputNumOfAuto.getText()),
                     Integer.parseInt(inputMinYear.getText()),
                     Integer.parseInt(inputMaxPrice.getText()));
             try {
-                remove(console);
-                console = as.doAutoScan();
-                mainContainer.add(console);
-                // TODO: 15.01.2020  !!repaint?
-                SwingUtilities.updateComponentTreeUI(this);
-                this.invalidate();
-                this.validate();
-                this.repaint();
+                as.doAutoScan();
+                // SwingUtilities.updateComponentTreeUI(this);
             } catch (IOException | ClassNotFoundException | BadLocationException | PrinterException | URISyntaxException ex) {
                 ex.printStackTrace();
             }
