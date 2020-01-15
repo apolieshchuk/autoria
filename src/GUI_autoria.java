@@ -10,13 +10,13 @@ import java.net.URISyntaxException;
 
 public class GUI_autoria extends JFrame implements ActionListener {
 
-    private static final int WINDOW_WIDTH = 550;
+    private static final int WINDOW_WIDTH = 900;
     private static final int WINDOW_HEIGHT = 600;
     private static final int WINDOW_MARGIN_X = 150;
     private static final int WINDOW_MARGIN_Y = 50;
 
     private JPanel mainContainer;
-    private JPanel console;
+    private JScrollPane console;
 
     /* Auto Input */
     private JLabel labelNumOfAuto = new JLabel("Scanned auto:");
@@ -48,24 +48,23 @@ public class GUI_autoria extends JFrame implements ActionListener {
         this.setBounds(WINDOW_MARGIN_X,WINDOW_MARGIN_Y, WINDOW_WIDTH, WINDOW_HEIGHT); // position
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-
-        // TODO: 15.01.2020 !!! 
         // main panel
         mainContainer = new JPanel ();
+        mainContainer.setLayout(new BorderLayout());
         this.add(mainContainer);
 
         // left panel
-        console = new Console(WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-        mainContainer.add(console);
+        console = new JScrollPane(new Console(WINDOW_WIDTH / 3, WINDOW_HEIGHT));
+        //mainContainer.add(console, BorderLayout.WEST);
 
         // right interact menu
-        mainContainer.add(createRightMenu());
-
+        mainContainer.add(createRightMenu(), BorderLayout.EAST);
     }
 
     private JPanel createRightMenu() {
         JPanel rightMenu = new JPanel();
         rightMenu.setLayout(new BoxLayout(rightMenu, BoxLayout.Y_AXIS));
+        rightMenu.setBackground(Color.blue);
 
         /* Auto-scan block */
         // label
@@ -109,6 +108,7 @@ public class GUI_autoria extends JFrame implements ActionListener {
 
     private JPanel createAutoScanInteractors() {
         JPanel wrapper = new JPanel();
+        wrapper.setBackground(Color.red);
 
         wrapper.add(labelNumOfAuto);
         wrapper.add(inputNumOfAuto);
@@ -131,8 +131,14 @@ public class GUI_autoria extends JFrame implements ActionListener {
                     Integer.parseInt(inputMinYear.getText()),
                     Integer.parseInt(inputMaxPrice.getText()));
             try {
-                mainContainer.add(as.doAutoScan());
-                SwingUtilities.updateComponentTreeUI(mainContainer);
+                remove(console);
+                console = as.doAutoScan();
+                mainContainer.add(console);
+                // TODO: 15.01.2020  !!repaint?
+                SwingUtilities.updateComponentTreeUI(this);
+                this.invalidate();
+                this.validate();
+                this.repaint();
             } catch (IOException | ClassNotFoundException | BadLocationException | PrinterException | URISyntaxException ex) {
                 ex.printStackTrace();
             }

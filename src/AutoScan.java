@@ -38,7 +38,7 @@ public class AutoScan {
         CarsList<Car> newAutos = new CarsUrlReader(FILTER_URL).getCars();
 
         /* LOG */
-        Console cmd = new Console(GUI_autoria.WIDTH / 2, GUI_autoria.HEIGHT / 2);
+        Console cmd = new Console(GUI_autoria.WIDTH / 3, GUI_autoria.HEIGHT);
 
         /* For every auto */
         int counter = 1;
