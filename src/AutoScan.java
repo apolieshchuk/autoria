@@ -1,4 +1,8 @@
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import java.awt.print.PrinterException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.stream.IntStream;
 
 public class AutoScan {
@@ -8,7 +12,7 @@ public class AutoScan {
     private static final String ANSI_RESET = "\u001B[0m"; // color changers for console text
     private static final String ANSI_GREEN = "\033[0;32m"; // color changers for console text
 
-    private static int SCAN_LAST_AUTO = 5;
+    private static int SCAN_LAST_AUTO = 2;
     private static int YEAR = 2008;
     private static int MAX_PRICE = 7000;
 
@@ -23,10 +27,18 @@ public class AutoScan {
                 "abroad.not=0&custom.not=1&page=0&size=" + numOfAuto;
     }
 
-    public void doAutoScan() throws IOException, ClassNotFoundException {
+    /**
+     * Return console with log
+     *
+     * @return Return console with log
+     */
+    public JScrollPane doAutoScan() throws IOException, ClassNotFoundException, BadLocationException, PrinterException, URISyntaxException {
 
         /* Get auto in filtered url */
         CarsList<Car> newAutos = new CarsUrlReader(FILTER_URL).getCars();
+
+        /* LOG */
+        Console cmd = new Console(GUI_autoria.WIDTH / 2, GUI_autoria.HEIGHT / 2);
 
         /* For every auto */
         int counter = 1;
@@ -45,21 +57,20 @@ public class AutoScan {
             int averagePriceMileage = calcAveragePrice(car, analyzer, CarAnalyzer.Arg.MILEAGE);
 
             /* Print log */
-            if (car.getPrice() < averagePriceMileage && car.getPrice() < averagePriceYear ){
-                System.out.print(ANSI_GREEN);
-            }
-            System.out.printf("%d. %s %s %d$ %d г. %d тыс.км ГБО - %b\n",
+            cmd.printLog(String.format("%d. %s %s %d$ %d г. %d тыс.км ГБО - %b\n",
                     counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice(),
-                    car.getYear(), car.getMileage(), car.getGbo());
-            System.out.printf("   Average price per year - %d$\n", averagePriceYear);
-            System.out.printf("   Average price per mileage - %d$\n", averagePriceMileage);
-            System.out.println("   " + car.getUrl() + ANSI_RESET);
+                    car.getYear(), car.getMileage(), car.getGbo()));
+            cmd.printLog(String.format("   Average price per year - %d$\n", averagePriceYear));
+            cmd.printLog(String.format("   Average price per mileage - %d$\n", averagePriceMileage));
+            cmd.printLog("   " + car.getUrl() + "\n",true);
 
             counter++;
         }
+
+        return new JScrollPane(cmd);
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, BadLocationException, PrinterException, URISyntaxException {
         new AutoScan(SCAN_LAST_AUTO, YEAR, MAX_PRICE).doAutoScan();
     }
 
@@ -103,5 +114,6 @@ public class AutoScan {
 
         return correctResults != 0 ? sum / correctResults : 0;
     }
+
 
 }

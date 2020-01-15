@@ -1,11 +1,22 @@
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.awt.print.PrinterException;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
 
 public class GUI_autoria extends JFrame implements ActionListener {
+
+    private static final int WINDOW_WIDTH = 550;
+    private static final int WINDOW_HEIGHT = 600;
+    private static final int WINDOW_MARGIN_X = 150;
+    private static final int WINDOW_MARGIN_Y = 50;
+
+    private JPanel mainContainer;
+    private JPanel console;
 
     /* Auto Input */
     private JLabel labelNumOfAuto = new JLabel("Scanned auto:");
@@ -30,61 +41,88 @@ public class GUI_autoria extends JFrame implements ActionListener {
     public static void main(String[] args) {
         GUI_autoria app = new GUI_autoria();
         app.setVisible(true);
-
     }
 
     public GUI_autoria() throws HeadlessException {
         super("Autoria scanner");
-        this.setBounds(200,100,550,250); // position
+        this.setBounds(WINDOW_MARGIN_X,WINDOW_MARGIN_Y, WINDOW_WIDTH, WINDOW_HEIGHT); // position
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // main panel
-        JPanel containerMain = new JPanel();
-        containerMain.setLayout(new BoxLayout(containerMain,BoxLayout.Y_AXIS));
-        this.add(containerMain);
 
-        // UP CONTAINER
-        JPanel containerUp = new JPanel(new GridLayout(3, 0) );
-        // NORTH (AUTO-SCAN)
+        // TODO: 15.01.2020 !!! 
+        // main panel
+        mainContainer = new JPanel ();
+        this.add(mainContainer);
+
+        // left panel
+        console = new Console(WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+        mainContainer.add(console);
+
+        // right interact menu
+        mainContainer.add(createRightMenu());
+
+    }
+
+    private JPanel createRightMenu() {
+        JPanel rightMenu = new JPanel();
+        rightMenu.setLayout(new BoxLayout(rightMenu, BoxLayout.Y_AXIS));
+
+        /* Auto-scan block */
+        // label
         JLabel l = new JLabel("AUTO.RIA.COM. AUTO-SCANNER ");
         l.setHorizontalAlignment(JLabel.CENTER);
-        containerUp.add(l);
-        // wrapper
-        JPanel wrapperUp = new JPanel();
-        wrapperUp.add(labelNumOfAuto, BorderLayout.SOUTH);
-        wrapperUp.add(inputNumOfAuto, BorderLayout.SOUTH);
-        wrapperUp.add(labelMinYear, BorderLayout.SOUTH);
-        wrapperUp.add(inputMinYear, BorderLayout.SOUTH);
-        wrapperUp.add(labelMaxPrice, BorderLayout.SOUTH);
-        wrapperUp.add(inputMaxPrice, BorderLayout.SOUTH);
-        containerUp.add(wrapperUp);
-        //button
-        containerUp.add(buttonAutoScan);
-        buttonAutoScan.addActionListener(this);
+        rightMenu.add(l);
 
-        // Bottom container
-        JPanel containerBot = new JPanel(new GridLayout(3, 0) );
-        // SOUTH (MANUAL-SCAN)
+        // Interactors
+        rightMenu.add(createAutoScanInteractors());
+
+        /* Manual -scan block*/
+        // label
         JLabel l2 = new JLabel("AUTO.RIA.COM. MANUAL-SCANNER ");
         l2.setHorizontalAlignment(JLabel.CENTER);
-        containerBot.add(l2);
-        JPanel wrapperBot = new JPanel();
-        wrapperBot.add(labelAutoManual, BorderLayout.SOUTH);
-        wrapperBot.add(inputAutoManual, BorderLayout.SOUTH);
-        wrapperBot.add(labelMileageManual, BorderLayout.SOUTH);
-        wrapperBot.add(inputMileageManual, BorderLayout.SOUTH);
-        wrapperBot.add(labelYearManual, BorderLayout.SOUTH);
-        wrapperBot.add(inputYearManual, BorderLayout.SOUTH);
-        wrapperBot.add(labelGboManual, BorderLayout.SOUTH);
-        wrapperBot.add(inputGboManual, BorderLayout.SOUTH);
-        containerBot.add(wrapperBot);
+        rightMenu.add(l2);
+
+        // Interactors
+        rightMenu.add(createManualScanInteractors());
+
+        return rightMenu;
+    }
+
+    private JPanel createManualScanInteractors() {
+        JPanel wrapper = new JPanel();
+
+        wrapper.add(labelAutoManual, BorderLayout.SOUTH);
+        wrapper.add(inputAutoManual, BorderLayout.SOUTH);
+        wrapper.add(labelMileageManual, BorderLayout.SOUTH);
+        wrapper.add(inputMileageManual, BorderLayout.SOUTH);
+        wrapper.add(labelYearManual, BorderLayout.SOUTH);
+        wrapper.add(inputYearManual, BorderLayout.SOUTH);
+        wrapper.add(labelGboManual, BorderLayout.SOUTH);
+        wrapper.add(inputGboManual, BorderLayout.SOUTH);
+
         //button
-        containerBot.add(buttonManualSearch);
+        wrapper.add(buttonManualSearch);
         buttonManualSearch.addActionListener(this);
 
-        // add containers in main pane
-        containerMain.add(containerUp);
-        containerMain.add(containerBot);
+        return wrapper;
+    }
+
+    private JPanel createAutoScanInteractors() {
+        JPanel wrapper = new JPanel();
+
+        wrapper.add(labelNumOfAuto);
+        wrapper.add(inputNumOfAuto);
+        wrapper.add(labelMinYear);
+        wrapper.add(inputMinYear);
+        wrapper.add(labelMaxPrice);
+        wrapper.add(inputMaxPrice);
+
+        //button
+        wrapper.add(buttonAutoScan);
+        buttonAutoScan.addActionListener(this);
+
+        return wrapper;
+
     }
 
     public void actionPerformed(ActionEvent e){
@@ -93,8 +131,9 @@ public class GUI_autoria extends JFrame implements ActionListener {
                     Integer.parseInt(inputMinYear.getText()),
                     Integer.parseInt(inputMaxPrice.getText()));
             try {
-                as.doAutoScan();
-            } catch (IOException | ClassNotFoundException ex) {
+                mainContainer.add(as.doAutoScan());
+                SwingUtilities.updateComponentTreeUI(mainContainer);
+            } catch (IOException | ClassNotFoundException | BadLocationException | PrinterException | URISyntaxException ex) {
                 ex.printStackTrace();
             }
         }
