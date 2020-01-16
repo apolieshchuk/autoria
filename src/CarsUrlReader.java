@@ -6,8 +6,12 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
@@ -65,7 +69,7 @@ public class CarsUrlReader {
     /**
      * Get array list with cars class in url
      */
-    private CarsList<Car> getCarsInUrl() {
+    private CarsList<Car> getCarsInUrl() throws UnsupportedEncodingException {
 
         if (document == null)  return null;
 
@@ -118,6 +122,10 @@ public class CarsUrlReader {
             /* Auto year, mark and model */
             Elements card_attr= ticket.select("div:first-child");
             car.setMark(card_attr.attr("data-mark-name"));
+            String str = card_attr.attr("data-model-name");
+            byte[] bytes = str.getBytes(StandardCharsets.ISO_8859_1);
+            String value = new String(bytes, StandardCharsets.UTF_16BE);
+            //System.out.println(value);
             car.setModel(card_attr.attr("data-model-name"));
             String year = card_attr.attr("data-year");
             if (CARS_LOG) System.out.println(year);

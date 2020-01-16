@@ -10,9 +10,6 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
     private static final int WINDOW_MARGIN_X = 150;
     private static final int WINDOW_MARGIN_Y = 50;
 
-    private JPanel mainContainer;
-    private MyConsole myConsole;
-
     /* Auto Input */
     private JLabel labelNumOfAuto = new JLabel("Scanned auto:");
     private JLabel labelMinYear = new JLabel("Min year:");
@@ -44,7 +41,7 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // main panel
-        mainContainer = new JPanel ();
+        JPanel mainContainer = new JPanel();
         mainContainer.setLayout(new BorderLayout());
         this.add(mainContainer);
 
