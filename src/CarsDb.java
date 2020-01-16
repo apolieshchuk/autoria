@@ -59,11 +59,12 @@ public class CarsDb {
              * WARNING !!! when go on num page default there- 10 auto FOREVER */
             int AUTO_IN_PAGE = 10;
             for (int i = 1; i < totalPages * 2; i++) { // *2 bc default 10 cars on page
+                MyConsole.printLog(String.format("\r%d/%d auto's %s %s",
+                        (i + 1) * AUTO_IN_PAGE, totalPages * 2 * AUTO_IN_PAGE, mark, model));
                 CarsList<Car> carsOnPage = autoRiaReader.getCars();
                 if (carsOnPage != null ) carsDb.addAll(carsOnPage);
                 autoRiaReader = new CarsUrlReader(markURL + "/?page=" + i);
-                System.out.printf("\r%d/%d auto's %s %s",
-                        (i + 1) * AUTO_IN_PAGE, totalPages * 2 * AUTO_IN_PAGE, mark, model);
+                MyConsole.removeLastMsg();
             }
             System.out.println();
         }

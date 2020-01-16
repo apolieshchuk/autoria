@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.stream.IntStream;
 
-public class AutoScan {
+public class AutoScan extends Thread{
 
     /* Error message */
     private static final String ANSI_RED = "\u001B[31m"; // color changers for console text
@@ -18,6 +18,7 @@ public class AutoScan {
 
     private static String FILTER_URL;
 
+
     public AutoScan(int numOfAuto, int year, int maxPrice) {
 
         FILTER_URL = "https://auto.ria.com/search/?year[0].gte=" + year
@@ -25,6 +26,15 @@ public class AutoScan {
                 "region.id[0]=16&city.id[0]=16&price.USD.lte=" + maxPrice +
                 "&price.currency=1&sort[0].order=dates.created.desc&" +
                 "abroad.not=0&custom.not=1&page=0&size=" + numOfAuto;
+    }
+
+    public void run(){
+        System.out.println("MyThread running");
+        try {
+            doAutoScan();
+        } catch (IOException | ClassNotFoundException | BadLocationException | PrinterException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -62,7 +72,7 @@ public class AutoScan {
                     car.getYear(), car.getMileage(), car.getGbo()));
             MyConsole.printLog(String.format("   Average price per year - %d$\n", averagePriceYear));
             MyConsole.printLog(String.format("   Average price per mileage - %d$\n", averagePriceMileage));
-            MyConsole.printLog("   " + car.getUrl() + "\n",true);
+            MyConsole.printLog("   " + car.getUrl() + "\n");
 
             counter++;
         }
@@ -70,6 +80,7 @@ public class AutoScan {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, BadLocationException, PrinterException, URISyntaxException {
         new AutoScan(SCAN_LAST_AUTO, YEAR, MAX_PRICE).doAutoScan();
+
     }
 
     /**

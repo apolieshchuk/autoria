@@ -1,11 +1,9 @@
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.print.PrinterException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
 public class GUI_autoria extends JFrame implements ActionListener, Constants {
 
@@ -51,7 +49,10 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
         this.add(mainContainer);
 
         // left panel
-        mainContainer.add(MyConsole.cmd(), BorderLayout.WEST);
+        JScrollPane sp = new JScrollPane(MyConsole.cmd());
+        sp.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+        sp.getVerticalScrollBar().setUnitIncrement(16);
+        mainContainer.add(sp, BorderLayout.WEST);
 
         // right interact menu
         mainContainer.add(createRightMenu(), BorderLayout.EAST);
@@ -60,7 +61,7 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
     private JPanel createRightMenu() {
         JPanel rightMenu = new JPanel();
         rightMenu.setLayout(new BoxLayout(rightMenu, BoxLayout.Y_AXIS));
-        rightMenu.setBackground(Color.blue);
+        // rightMenu.setBackground(Color.blue);
 
         /* Auto-scan block */
         // label
@@ -104,7 +105,7 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
 
     private JPanel createAutoScanInteractors() {
         JPanel wrapper = new JPanel();
-        wrapper.setBackground(Color.red);
+        // wrapper.setBackground(Color.red);
 
         wrapper.add(labelNumOfAuto);
         wrapper.add(inputNumOfAuto);
@@ -127,29 +128,28 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
             AutoScan as = new AutoScan(Integer.parseInt(inputNumOfAuto.getText()),
                     Integer.parseInt(inputMinYear.getText()),
                     Integer.parseInt(inputMaxPrice.getText()));
-            try {
-                as.doAutoScan();
-                // SwingUtilities.updateComponentTreeUI(this);
-            } catch (IOException | ClassNotFoundException | BadLocationException | PrinterException | URISyntaxException ex) {
-                ex.printStackTrace();
-            }
+            as.start();
+            new KeyBlocker(as, buttonAutoScan).start();
         }
         else if (e.getSource() == buttonManualSearch){
 
         }
     }
 
+    public static class KeyBlocker extends Thread {
 
-    public static class MyThread extends Thread {
-        public void run() {
-            while (true){
-                System.out.println(" Run !!!");
-            }
+        private JComponent blockedKey;
+        private AutoScan runningThread;
+
+        public KeyBlocker(AutoScan thread, JButton buttonAutoScan) {
+            blockedKey = buttonAutoScan;
+            runningThread = thread;
         }
-    }
 
-    public void onClick() {
-        MyThread myThread = new MyThread();
-        myThread.start();
+        public void run() {
+            blockedKey.setEnabled(false);
+            while (runningThread.getState() == State.RUNNABLE)
+            blockedKey.setEnabled(true);
+        }
     }
 }
