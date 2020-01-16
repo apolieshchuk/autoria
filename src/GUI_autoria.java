@@ -116,6 +116,11 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
 
         //button
         wrapper.add(buttonAutoScan);
+
+        //listeners
+        inputMinYear.addActionListener(this);
+        inputMaxPrice.addActionListener(this);
+        inputNumOfAuto.addActionListener(this);
         buttonAutoScan.addActionListener(this);
 
         return wrapper;
@@ -123,12 +128,15 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
     }
 
     public void actionPerformed(ActionEvent e){
-        if (e.getSource() == buttonAutoScan){
+        if (e.getSource() == buttonAutoScan || e.getSource() == inputNumOfAuto
+        || e.getSource() == inputMinYear || e.getSource() == inputMaxPrice){
             MyConsole.clear();
             AutoScan as = new AutoScan(Integer.parseInt(inputNumOfAuto.getText()),
                     Integer.parseInt(inputMinYear.getText()),
                     Integer.parseInt(inputMaxPrice.getText()));
             as.start();
+
+            /* Block button while logging report */
             new KeyBlocker(as, buttonAutoScan).start();
         }
         else if (e.getSource() == buttonManualSearch){
@@ -147,8 +155,15 @@ public class GUI_autoria extends JFrame implements ActionListener, Constants {
         }
 
         public void run() {
+            System.out.println("Start key blocker!");
             blockedKey.setEnabled(false);
-            while (runningThread.getState() == State.RUNNABLE)
+            while (runningThread.getState() == State.RUNNABLE) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             blockedKey.setEnabled(true);
         }
     }

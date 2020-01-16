@@ -1,4 +1,5 @@
 import javax.swing.text.BadLocationException;
+import java.awt.*;
 import java.awt.print.PrinterException;
 import java.io.Console;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class AutoScan extends Thread{
     }
 
     public void run(){
-        System.out.println("MyThread running");
+        System.out.println("Auto-scan thread running");
         try {
             doAutoScan();
         } catch (IOException | ClassNotFoundException | BadLocationException | PrinterException | URISyntaxException e) {
@@ -66,12 +67,18 @@ public class AutoScan extends Thread{
             /* Mileage - average price */
             int averagePriceMileage = calcAveragePrice(car, analyzer, CarAnalyzer.Arg.MILEAGE);
 
+            /* Message color */
+            Color color = Color.BLACK;
+            if (car.getPrice() <= averagePriceYear && car.getPrice() <= averagePriceMileage){
+                color = Color.decode("#00CC00");
+            }
+
             /* Print log */
             MyConsole.printLog(String.format("%d. %s %s %d$ %d г. %d тыс.км ГБО - %b\n",
                     counter, car.getMark().toUpperCase(), car.getModel().toUpperCase(), car.getPrice(),
-                    car.getYear(), car.getMileage(), car.getGbo()));
-            MyConsole.printLog(String.format("   Average price per year - %d$\n", averagePriceYear));
-            MyConsole.printLog(String.format("   Average price per mileage - %d$\n", averagePriceMileage));
+                    car.getYear(), car.getMileage(), car.getGbo()), color);
+            MyConsole.printLog(String.format("   Average price per year - %d$\n", averagePriceYear), color);
+            MyConsole.printLog(String.format("   Average price per mileage - %d$\n", averagePriceMileage), color);
             MyConsole.printLog("   " + car.getUrl() + "\n");
 
             counter++;
